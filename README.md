@@ -101,7 +101,6 @@ Notes
 Future Improvements  
 - Database integration (MySQL or PostgreSQL)  
 - Authentication system  
-- Interaction history page  
 - Sentiment analysis  
 - State management with Redux  
 
