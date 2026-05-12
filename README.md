@@ -28,18 +28,6 @@ Backend:
 AI:  
 - Groq API (Llama / Gemma models)  
 
-Project Structure  
-
-
-
-hcp-crm/
-├── backend/
-│   └── main.py
-├── frontend/
-│   └── src/
-│       └── App.jsx
-└── README.md
-
 
 Setup Instructions  
 
