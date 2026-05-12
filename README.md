@@ -100,10 +100,12 @@ Notes
 
 Future Improvements  
 - Database integration (MySQL or PostgreSQL)  
-- Authentication system  
+- Authentication system
 - Sentiment analysis  
 - State management with Redux  
 
 License  
 This project is for educational and portfolio purposes.
-```
+
+
+
