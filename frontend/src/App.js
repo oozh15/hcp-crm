@@ -23,7 +23,7 @@ export default function App() {
           <span style={{ color: "#fff", fontSize: 14 }}>+</span>
         </div>
         <span style={{ fontWeight: 700, fontSize: 15, marginRight: 16 }}>HCP CRM</span>
-        {[["log", "Log Interaction"], ["chat", "AI Chat"], ["history", "History"]].map(([id, label]) => (
+        {[["log", "Log Interaction"], ["history", "History"]].map(([id, label]) => (
           <button key={id} onClick={() => setPage(id)} style={{
             padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 500,
             background: page === id ? S.primaryLight : "transparent",
@@ -36,7 +36,6 @@ export default function App() {
       </div>
 
       {page === "log" && <LogPage />}
-      {page === "chat" && <ChatPage />}
       {page === "history" && <HistoryPage />}
     </div>
   );
@@ -266,95 +265,7 @@ function LogPage() {
   );
 }
 
-// ─── CHAT PAGE ────────────────────────────────────────────────────────────────
-function ChatPage() {
-  const [messages, setMessages] = useState([
-    { role: "ai", text: "Hello! I'm your HCP AI assistant. Ask me to log interactions, retrieve history, suggest follow-ups, or analyze sentiment." }
-  ]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const bottomRef = useRef(null);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-
-  const send = async () => {
-    const msg = input.trim();
-    if (!msg) return;
-    setMessages(m => [...m, { role: "user", text: msg }]);
-    setInput("");
-    setLoading(true);
-    try {
-      const res = await fetch(`${API}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg })
-      });
-      const data = await res.json();
-      const reply = data.reply || data.topics || JSON.stringify(data, null, 2);
-      setMessages(m => [...m, { role: "ai", text: reply }]);
-    } catch {
-      setMessages(m => [...m, { role: "ai", text: "⚠️ Could not reach backend." }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const QUICK = ["Summarize today's interactions", "Who did I meet last week?", "Suggest follow-ups for Dr. Sharma", "Show sentiment trend"];
-
-  return (
-    <div style={{ maxWidth: 760, margin: "0 auto", padding: 20, display: "flex", flexDirection: "column", height: "calc(100vh - 92px)" }}>
-      <div style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: "12px 12px 0 0", padding: "14px 20px" }}>
-        <div style={{ fontWeight: 700, fontSize: 15 }}>HCP AI Assistant</div>
-        <div style={{ fontSize: 12, color: S.muted }}>LangGraph Agent · 10 tools connected</div>
-      </div>
-
-      <div style={{ flex: 1, overflowY: "auto", background: S.bg, padding: 16, display: "flex", flexDirection: "column", gap: 12, border: `1px solid ${S.border}`, borderTop: "none" }}>
-        {messages.map((m, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-            <div style={{
-              maxWidth: "75%", padding: "10px 14px",
-              borderRadius: m.role === "user" ? "12px 12px 4px 12px" : "12px 12px 12px 4px",
-              background: m.role === "user" ? S.primary : S.surface,
-              color: m.role === "user" ? "#fff" : S.text,
-              border: m.role === "ai" ? `1px solid ${S.border}` : "none",
-              fontSize: 13.5, lineHeight: 1.6, whiteSpace: "pre-wrap"
-            }}>{m.text}</div>
-          </div>
-        ))}
-        {loading && (
-          <div style={{ display: "flex" }}>
-            <div style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: "12px 12px 12px 4px", padding: "10px 16px", fontSize: 13, color: S.muted }}>
-              Thinking...
-            </div>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      <div style={{ background: S.surface, border: `1px solid ${S.border}`, borderTop: "none", padding: "8px 12px", display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {QUICK.map(q => (
-          <button key={q} onClick={() => setInput(q)} style={{ fontSize: 11, padding: "4px 10px", border: `1px solid ${S.border}`, borderRadius: 20, background: S.surface, color: S.muted, cursor: "pointer" }}>
-            {q}
-          </button>
-        ))}
-      </div>
-
-      <div style={{ background: S.surface, border: `1px solid ${S.border}`, borderTop: "none", borderRadius: "0 0 12px 12px", padding: "10px 14px", display: "flex", gap: 10 }}>
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => { if (e.key === "Enter") send(); }}
-          placeholder="Ask AI or describe an interaction..."
-          style={{ ...inputStyle, flex: 1 }}
-        />
-        <button onClick={send} disabled={!input.trim() || loading} style={{
-          width: 42, height: 38, borderRadius: 8, border: "none",
-          background: input.trim() ? S.primary : S.border, color: "#fff", cursor: "pointer", fontSize: 16
-        }}>➤</button>
-      </div>
-    </div>
-  );
-}
 
 // ─── HISTORY PAGE ─────────────────────────────────────────────────────────────
 function HistoryPage() {
